@@ -9,6 +9,10 @@ public class SpellCastManager : MonoBehaviour
     public AudioClip crystalCrush;
     public GameObject crystal;
 
+    [Header("Timer")]
+    public float maxCastTime = 2f; // 5 seconds to cast
+    private float currentCastTime = 0f;
+
     private AudioSource aSource;
     private bool isCasting = false;
     private List<char> currentSequence = new List<char>();
@@ -19,12 +23,13 @@ public class SpellCastManager : MonoBehaviour
     // Exposed for display
     public string CurrentSequence => new string(currentSequence.ToArray());
     public string CurrentSpell { get; private set; } = "";
+    public float CastTimeNormalized => currentCastTime / maxCastTime; // 0–1 for UI
 
     // Dictionary mapping sequences to spell names
     private Dictionary<string, string> spellDictionary = new Dictionary<string, string>()
     {
         { "EE", "Push" },
-        { "ER", "Fireball" },
+        { "ER", "Pull" },
         { "RF", "Shield" },
         // add more sequences here
     };
@@ -44,11 +49,27 @@ public class SpellCastManager : MonoBehaviour
             StartCasting();
         }
 
+        // Update timer
+        if (isCasting)
+        {
+            currentCastTime -= Time.deltaTime;
+            if (currentCastTime <= 0f)
+            {
+                CurrentSpell = "Fizzle"; // time ran out
+                StopCasting();
+            }
+        }
+
         // Stop casting on left-click and check spell
         if (Input.GetMouseButtonDown(0) && isCasting)
         {
-            CheckSpell();
-            StopCasting();
+            // Dont stop casting until time runs out or correct spell is cast
+            if (CheckSpell())
+            {
+                StopCasting();
+            }
+            else currentSequence.Clear();
+
         }
     }
 
@@ -65,6 +86,7 @@ public class SpellCastManager : MonoBehaviour
         isCasting = true;
         currentSequence.Clear();
         CurrentSpell = "";
+        currentCastTime = maxCastTime;
 
         if (crystalCrush != null)
             aSource.PlayOneShot(crystalCrush);
@@ -77,18 +99,23 @@ public class SpellCastManager : MonoBehaviour
     {
         isCasting = false;
         currentSequence.Clear();
+        currentCastTime = 0f;
 
         if (crystal != null)
             crystal.SetActive(true);
     }
 
-    private void CheckSpell()
+    private bool CheckSpell()
     {
         string sequence = CurrentSequence;
 
-        if (spellDictionary.ContainsKey(sequence))
-            CurrentSpell = spellDictionary[sequence];
-        else
-            CurrentSpell = "Failed";
+        if (spellDictionary.TryGetValue(sequence, out string spell))
+        {
+            CurrentSpell = spell;
+            return true; // correct spell
+        }
+
+        CurrentSpell = "Failed";
+        return false; // wrong spell
     }
 }
