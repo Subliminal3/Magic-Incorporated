@@ -2117,8 +2117,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxLength: 3
-  crystalCrush: {fileID: 8300000, guid: 97720068716d1294dbdd3a83312d1499, type: 3}
   crystal: {fileID: 1474951221}
+  crystalCrush: {fileID: 8300000, guid: 97720068716d1294dbdd3a83312d1499, type: 3}
+  fizzle: {fileID: 8300000, guid: df63bc2bb1c54524cbd10530f67e2607, type: 3}
+  spellCast: {fileID: 8300000, guid: 8f8330979801d48449a2cd11dae42aaf, type: 3}
   maxCastTime: 2
 --- !u!1001 &1374083708
 PrefabInstance:

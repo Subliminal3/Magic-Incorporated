@@ -4,10 +4,13 @@ using UnityEngine;
 public class SpellCastManager : MonoBehaviour
 {
     public int maxLength = 3;
+    public GameObject crystal;
 
     [Header("Sounds")]
     public AudioClip crystalCrush;
-    public GameObject crystal;
+    public AudioClip fizzle;
+    public AudioClip spellCast;
+
 
     [Header("Timer")]
     public float maxCastTime = 2f; // 5 seconds to cast
@@ -55,7 +58,7 @@ public class SpellCastManager : MonoBehaviour
             currentCastTime -= Time.deltaTime;
             if (currentCastTime <= 0f)
             {
-                CurrentSpell = "Fizzle"; // time ran out
+                //Fizzle();// time ran out
                 StopCasting();
             }
         }
@@ -68,7 +71,7 @@ public class SpellCastManager : MonoBehaviour
             {
                 StopCasting();
             }
-            else currentSequence.Clear();
+            else Fizzle();
 
         }
     }
@@ -95,6 +98,15 @@ public class SpellCastManager : MonoBehaviour
             crystal.SetActive(false);
     }
 
+    private void Fizzle()
+    {
+        CurrentSpell = "Fizzle";
+
+        currentSequence.Clear();
+
+        aSource.PlayOneShot(fizzle);
+    }
+
     private void StopCasting()
     {
         isCasting = false;
@@ -112,6 +124,7 @@ public class SpellCastManager : MonoBehaviour
         if (spellDictionary.TryGetValue(sequence, out string spell))
         {
             CurrentSpell = spell;
+            aSource.PlayOneShot(spellCast);
             return true; // correct spell
         }
 
