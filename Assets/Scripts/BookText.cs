@@ -1,13 +1,26 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class BookText : MonoBehaviour
 {
     public TMP_Text bookText;
     public int maxLength = 3; // max letters in sequence
+    public GameObject crystal;
+
+    [Header("Sounds")]
+    public AudioClip crystalCrush;
 
     private bool isCasting = false;
+    private AudioSource aSource;
 
+    private void Start()
+    {
+        // Add or get AudioSource
+        aSource = gameObject.GetComponent<AudioSource>();
+        if (aSource == null)
+            aSource = gameObject.AddComponent<AudioSource>();
+    }
 
     void Update()
     {
@@ -15,6 +28,12 @@ public class BookText : MonoBehaviour
         if (Input.GetMouseButtonDown(1) && !isCasting)
         {
             isCasting = true;
+
+            // Play the crystal sound
+            if (crystalCrush != null)
+                aSource.PlayOneShot(crystalCrush);
+
+            crystal.SetActive(false);
         }
 
         if (!(bookText.text.Length >= maxLength) && isCasting)
@@ -31,6 +50,8 @@ public class BookText : MonoBehaviour
         {
             bookText.text = "";
             isCasting = false;
+
+            crystal.SetActive(true);
         }
     }
 }
