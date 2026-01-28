@@ -20,6 +20,8 @@ public class SpellCastManager : MonoBehaviour
     private bool isCasting = false;
     private List<char> currentSequence = new List<char>();
 
+    private SpellEffects spellEffects;
+
     // Lambda property for BookText
     public bool IsCasting => isCasting;
 
@@ -39,6 +41,8 @@ public class SpellCastManager : MonoBehaviour
 
     private void Start()
     {
+        spellEffects = GetComponent<SpellEffects>();
+
         aSource = GetComponent<AudioSource>();
         if (aSource == null)
             aSource = gameObject.AddComponent<AudioSource>();
@@ -125,7 +129,10 @@ public class SpellCastManager : MonoBehaviour
         {
             CurrentSpell = spell;
             aSource.PlayOneShot(spellCast);
-            return true; // correct spell
+
+            spellEffects?.CastSpell(spell);
+
+            return true;
         }
 
         CurrentSpell = "Failed";
