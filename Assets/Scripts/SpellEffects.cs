@@ -6,6 +6,13 @@ public class SpellEffects : MonoBehaviour
     public float pushForce = 10f;
     public float pushRange = 5f;
 
+    [Header("VFX")]
+    public GameObject pushEffect;
+
+    // Scale multiplier for the VFX, editable in the Inspector
+    [Tooltip("Multiplier for the visual size of the effect")]
+    public float pushEffectScale = 1f;
+
     public void CastSpell(string spellName)
     {
         switch (spellName)
@@ -46,6 +53,24 @@ public class SpellEffects : MonoBehaviour
 
             rb.WakeUp();
             rb.AddForce(toTarget * pushForce, ForceMode.Impulse);
+        }
+
+        // play effect
+
+        // Spawn effect
+        if (pushEffect != null)
+        {
+
+            GameObject effect = Instantiate(pushEffect, origin, Quaternion.LookRotation(transform.forward));
+
+            // Scale using the editable multiplier
+            effect.transform.localScale = Vector3.one * pushEffectScale;
+
+            Destroy(effect, 3f);
+
+            ParticleSystem ps = effect.GetComponent<ParticleSystem>();
+            if (ps != null)
+                ps.Play();
         }
 
     }
