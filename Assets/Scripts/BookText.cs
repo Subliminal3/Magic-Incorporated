@@ -1,13 +1,13 @@
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
+
 
 public class BookText : MonoBehaviour
 {
     public TMP_Text bookText;
     public TMP_Text spellDisplay;
     public int maxLength = 3;
-    public Slider castSlider;
+    
 
     private SpellCastManager spellCastManager;
 
@@ -39,17 +39,6 @@ public class BookText : MonoBehaviour
         bookText.text = spellCastManager.CurrentSequence;
         spellDisplay.text = spellCastManager.CurrentSpell;
 
-        // Update slider (1 to 0)
-        if (castSlider == null)
-            return;
-
-        if (spellCastManager.IsCasting)
-        {
-            castSlider.value = spellCastManager.CastTimeNormalized;
-        }
-        else
-        {
-            castSlider.value = 0f;
-        }
+        
     }
 }
