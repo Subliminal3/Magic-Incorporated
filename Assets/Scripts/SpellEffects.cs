@@ -35,7 +35,7 @@ public class SpellEffects : MonoBehaviour
     //checks in a radius around the player for targetable objects with rigid body then checks which ones are in a cone area in front and applies a force
     void ForcePush()
     {
-        Vector3 origin = transform.position + transform.forward * 1.5f;
+        Vector3 origin = transform.position + transform.forward * .5f;
         float radius = 3f;
 
         Collider[] hits = Physics.OverlapSphere(origin, radius);
