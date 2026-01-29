@@ -5,13 +5,16 @@ public class UI : MonoBehaviour
 {
 
     public Slider castSlider;
+    public Slider playerHpSlider;
 
     private SpellCastManager spellCastManager;
+    private PlayerStats playerStats;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         spellCastManager = FindFirstObjectByType<SpellCastManager>();
+        playerStats = FindFirstObjectByType<PlayerStats>();
 
         if (spellCastManager == null)
             Debug.LogError("No SpellCastManager found in the scene!");
@@ -20,7 +23,7 @@ public class UI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Update slider (1 to 0)
+        // Update casting Slider
         if (castSlider == null)
             return;
 
@@ -32,5 +35,8 @@ public class UI : MonoBehaviour
         {
             castSlider.value = 0f;
         }
+
+        //update slider to player hp
+        playerHpSlider.value = playerStats.currentHP/100;
     }
 }

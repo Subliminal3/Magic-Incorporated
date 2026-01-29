@@ -2,7 +2,16 @@ using UnityEngine;
 
 public class PlayerStats : MonoBehaviour
 {
-    [SerializeField] float playerHp = 100;
+    public float maxHP = 100;
+    public float currentHP;
 
 
+    private void Start()
+    {
+        currentHP = maxHP;
+    }
+    public void TakeDamage(float damage)
+    {
+        currentHP -= damage;
+    }
 }
