@@ -53,6 +53,13 @@ public class SpellEffects : MonoBehaviour
 
             rb.WakeUp();
             rb.AddForce(toTarget * pushForce, ForceMode.Impulse);
+
+            // GET ENEMY SCRIPT AND CALL FUNCTION
+            Enemy enemy = rb.GetComponent<Enemy>();
+            if (enemy != null)
+            {
+                enemy.HitBySpell();
+            }
         }
 
         // play effect

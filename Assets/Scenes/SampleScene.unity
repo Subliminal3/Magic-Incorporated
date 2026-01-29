@@ -1088,13 +1088,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 370625295}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7104139, y: -0, z: -0, w: 0.7037842}
-  m_LocalPosition: {x: 0, y: 1.288, z: -0.369}
+  m_LocalRotation: {x: -0.50243205, y: -0.49755785, z: -0.5022448, w: 0.49774337}
+  m_LocalPosition: {x: 0.352, y: 1.288, z: 0.014}
   m_LocalScale: {x: 0.27522, y: 0.27522, z: 0.27522}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 439464755}
-  m_LocalEulerAnglesHint: {x: -90.537, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90.537, y: -89.979004, z: 0}
 --- !u!136 &370625297
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1354,7 +1354,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 80
   m_CollisionDetection: 0
 --- !u!136 &439464757
 CapsuleCollider:
@@ -1705,7 +1705,7 @@ Transform:
   m_GameObject: {fileID: 541158174}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 23.16}
+  m_LocalPosition: {x: 0, y: 1, z: 23.19}
   m_LocalScale: {x: 0.6818, y: 0.6818, z: 0.6818}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4096,7 +4096,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 750d7e9b907451843b40759b2cdd1b08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pushForce: 10
+  pushForce: 1
   pushRange: 20
   pushEffect: {fileID: 3398366222349601506, guid: 3af328b9a7e29044bade7641dd722166, type: 3}
   pushEffectScale: 1

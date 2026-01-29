@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
@@ -20,13 +21,28 @@ public class Enemy : MonoBehaviour
 
         if (distance > meleeRange)
         {
-            MoveTowardsPlayer();
+            //MoveTowardsPlayer();
+            FacePlayer();
         }
+    }
+
+    void FacePlayer()
+    {
+        Vector3 lookDir = player.transform.position;// - transform.position;
+        lookDir.y = 0f; // keep upright
+
+        if (lookDir != Vector3.zero)
+            transform.rotation = Quaternion.LookRotation(lookDir);
     }
 
     void MoveTowardsPlayer()
     {
         Vector3 direction = (player.transform.position - transform.position).normalized;
         transform.position += direction * moveSpeed * Time.deltaTime;
+    }
+
+    public void HitBySpell()
+    {
+        
     }
 }
