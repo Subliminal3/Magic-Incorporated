@@ -7,7 +7,7 @@ public class Enemy : MonoBehaviour
 {
     private GameObject player;
     private PlayerStats playerStats;
-    private NavMeshAgent enemy;
+    private NavMeshAgent enemyAgent;
     private bool isAttacking = false;
 
     private event Action OnHit;
@@ -20,15 +20,15 @@ public class Enemy : MonoBehaviour
     private void Start()
     {
 
-        enemy = GetComponent<NavMeshAgent>();
+        enemyAgent = GetComponent<NavMeshAgent>();
         player = GameObject.FindWithTag("Player");
         playerStats = player.GetComponent<PlayerStats>();
 
-        enemy.stoppingDistance = meleeRange;
-        enemy.speed = moveSpeed;
+        enemyAgent.stoppingDistance = meleeRange *.8f;
+        enemyAgent.speed = moveSpeed;
     }
     // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {
         if (player == null)
         {
@@ -41,8 +41,12 @@ public class Enemy : MonoBehaviour
 
         //Square for optimization
         float sqrDistance = distToPlayer.sqrMagnitude;
+
+        if((enemyAgent.enabled == true) && !isAttacking)
+        {
+            MoveTowardsPlayer();
+        }
         
-        MoveTowardsPlayer();
 
         //if enemy is in melee range
         if (sqrDistance <= meleeRange * meleeRange && !isAttacking)
@@ -73,7 +77,7 @@ public class Enemy : MonoBehaviour
 
     void MoveTowardsPlayer()
     {
-        enemy.SetDestination(player.transform.position);
+        enemyAgent.SetDestination(player.transform.position);
     }
 
     public void HitBySpell()

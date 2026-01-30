@@ -1,4 +1,6 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class SpellEffects : MonoBehaviour
 {
@@ -54,8 +56,24 @@ public class SpellEffects : MonoBehaviour
 
             if (dot < 0.3f) continue; // ~70° forward cone
 
+            Debug.Log("Pushing");
+            rb.isKinematic = false;   // Allow physics
             rb.WakeUp();
+
+            //Disable nav mesh to apply force
+            NavMeshAgent agent = rb.GetComponentInParent<NavMeshAgent>();
+            if (agent != null)
+            {
+                agent.enabled = false;
+            }
+
+            //Add force
             rb.AddForce(toTarget * pushForce, ForceMode.Impulse);
+
+            agent.velocity = rb.linearVelocity;
+
+            // Start coroutine to restore kinematic
+            StartCoroutine(ReturnToKinematic(rb, agent));
 
             // GET ENEMY SCRIPT AND CALL FUNCTION
             Enemy enemy = rb.GetComponent<Enemy>();
@@ -94,5 +112,23 @@ public class SpellEffects : MonoBehaviour
     void Shield()
     {
         // placeholder
+    }
+
+    IEnumerator ReturnToKinematic(Rigidbody rb, NavMeshAgent agent)
+    {
+        yield return new WaitForSeconds(5f);
+
+        // Wait until the Rigidbody slows down
+        while (rb.linearVelocity.sqrMagnitude > 0.01f)
+        {
+            yield return null; // wait 1 frame
+        }
+
+        rb.linearVelocity = Vector3.zero;
+        rb.isKinematic = true;
+
+        agent.enabled = true;
+
+        
     }
 }
