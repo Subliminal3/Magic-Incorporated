@@ -51,12 +51,24 @@ public class SpellEffects : MonoBehaviour
             if (rb == null) continue;
 
             // Direction check (only in front)
-            Vector3 toTarget = (rb.position - transform.position).normalized;
-            float dot = Vector3.Dot(transform.forward, toTarget);
+            Vector3 direction = (rb.position - transform.position).normalized;
+            float dot = Vector3.Dot(transform.forward, direction);
 
             if (dot < 0.3f) continue; // ~70° forward cone
 
-            Debug.Log("Pushing");
+            NavMeshAgent agent = rb.GetComponentInParent<NavMeshAgent>();
+            agent.enabled = false;
+
+            rb.isKinematic = false;
+
+            rb.AddForce(direction * pushForce, ForceMode.Impulse);
+
+            StartCoroutine(ReturnToKinematic(rb, agent));
+
+            
+
+
+            /*Debug.Log("Pushing");
             rb.isKinematic = false;   // Allow physics
             rb.WakeUp();
 
@@ -80,7 +92,7 @@ public class SpellEffects : MonoBehaviour
             if (enemy != null)
             {
                 enemy.HitBySpell();
-            }
+            }*/
         }
 
         // play effect
@@ -116,9 +128,13 @@ public class SpellEffects : MonoBehaviour
 
     IEnumerator ReturnToKinematic(Rigidbody rb, NavMeshAgent agent)
     {
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(2f);
+        
 
-        // Wait until the Rigidbody slows down
+        rb.isKinematic = true;
+        agent.enabled = true;
+        agent.Warp(rb.position);
+        /*// Wait until the Rigidbody slows down
         while (rb.linearVelocity.sqrMagnitude > 0.01f)
         {
             yield return null; // wait 1 frame
@@ -127,8 +143,13 @@ public class SpellEffects : MonoBehaviour
         rb.linearVelocity = Vector3.zero;
         rb.isKinematic = true;
 
-        agent.enabled = true;
+        agent.enabled = true;*/
 
-        
+
+    }
+
+    IEnumerator WaitTime()
+    {
+        yield return new WaitForSeconds(3);
     }
 }
