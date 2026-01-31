@@ -11,6 +11,7 @@ public class HexGrid : MonoBehaviour
     [SerializeField] int map_size;
     [SerializeField] float outerRadius;
     [SerializeField] float spacing;
+    public TileTypeSO[] tilePalette;
 
     [ContextMenu("Generate Map")]
     void GenerateMap()
@@ -19,6 +20,10 @@ public class HexGrid : MonoBehaviour
         float innerRadius = outerRadius * 0.866025404f;
         int height = map_size;
         int width = map_size;
+        GameObject hex_map = new GameObject("hex map");
+        hex_map.transform.SetParent(this.transform, false);
+        //hex_map.transform.position += new Vector3(width * innerRadius * 2f, 0, height * outerRadius * 1.5f);
+
         for (int z = 0; z < height; z++)
         {
             for (int x = 0; x < width; x++)
@@ -39,7 +44,7 @@ public class HexGrid : MonoBehaviour
                 position = new Vector3(xPos, 0, zPos) * spacing;
 
                 GameObject hex = Instantiate(hex_tile, position, Quaternion.Euler(90,0,0));
-                hex.transform.SetParent(transform);
+                hex.transform.SetParent(hex_map.transform); 
                 hex.name = $"Hex_{x}_{z}";
             }
         }
