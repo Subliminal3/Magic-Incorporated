@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b5e9f6741386ea4ca83095d44e7da41, type: 3}
+  m_Name: AttackState
+  m_EditorClassIdentifier: 
+  ifTargetIsDead: {fileID: 11400000, guid: 48130bad44f8bec4f8bf0f58bcaa532e, type: 2}
+  ifTargetOutOfRange: {fileID: 11400000, guid: d8876cbb27fa5cf44aa546e51225b26d, type: 2}

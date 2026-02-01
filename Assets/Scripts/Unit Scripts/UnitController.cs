@@ -5,11 +5,16 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class UnitController : MonoBehaviour
 {
-    [SerializeField] private UnitData data;
-    public UnitData Data => data;
-    
+    public UnitData data;
     private NavMeshAgent agent;
+    public NavMeshAgent Agent => agent;
+    
+    public UnitController Target { get; set; }
+    public LayerMask enemyLayer;
     public int CurrentHealth { get; private set; }
+    public Vector3 patrolPoint { get; set; }
+    public bool hasPatrolPoint { get; set; }
+    public float lastPatrolTime { get; set; }
 
     private void Awake()
     {
@@ -35,11 +40,6 @@ public class UnitController : MonoBehaviour
         agent.stoppingDistance = data.stoppingDistance;
     }
 
-    /// <summary>
-    /// Takes damage from an attack. Returns true if the unit died.
-    /// </summary>
-    /// <param name="damage">Amount of damage to take</param>
-    /// <returns>True if unit died, false otherwise</returns>
     public bool TakeDamage(int damage)
     {
         if (CurrentHealth <= 0)
@@ -86,5 +86,26 @@ public class UnitController : MonoBehaviour
             }
         }
         return false;
+    }
+
+    public UnitController FindNearestEnemy()
+    {
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, data.detectionRange, enemyLayer);
+        UnitController nearestEnemy = null;
+        float nearestDistance = Mathf.Infinity;
+        
+        foreach (var hitCollider in hitColliders)
+        {
+            if (hitCollider.transform != transform && hitCollider.GetComponent<UnitController>() != null)
+            {
+                float distance = Vector3.Distance(transform.position, hitCollider.transform.position);
+                if (distance < nearestDistance)
+                {
+                    nearestDistance = distance;
+                    nearestEnemy = hitCollider.GetComponent<UnitController>();
+                }
+            }
+        }
+        return nearestEnemy;
     }
 }
