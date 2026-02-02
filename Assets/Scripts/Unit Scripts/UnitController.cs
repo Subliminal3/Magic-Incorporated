@@ -21,10 +21,8 @@ public class UnitController : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
     }
 
-    private void Start()
+    protected virtual void Start()
     {
-        // If data is assigned in inspector, load it. 
-        // If you spawn units via code, you might call Initialize(data) manually.
         if (data != null) Initialize(data);
     }
 

@@ -2,61 +2,58 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
-[RequireComponent(typeof(UnitController))]
-public class AIController : MonoBehaviour
+public class AIController : UnitController
 {
     public AIStateMachine stateMachine;
     
-    [HideInInspector] public UnitController unitController;
-    
-    [SerializeField] private AIState currentState;
+    private AIState currentState;
     private NavMeshAgent agent;
 
-    private void Awake()
+    protected override void Start()
     {
-        unitController = GetComponent<UnitController>();
-        agent = GetComponent<NavMeshAgent>();
-    }
+        if (data != null) Initialize(data);
 
-    private void Start()
-    {
         if (stateMachine != null)
         {
             currentState = stateMachine.startingState;
             if (currentState != null)
             {
-                currentState.OnEnter(unitController);
+                currentState.OnEnter(this);
             }
         }
+
+        base.Start();
     }
 
     private void Update()
     {
-        if (currentState == null || unitController.CurrentHealth <= 0)
+        if (currentState == null || CurrentHealth <= 0)
         {
-            if (unitController.CurrentHealth <= 0)
+            if (CurrentHealth <= 0)
             {
                 agent.isStopped = true;
             }
             return;
         }
 
-        AIState nextState = currentState.Tick(unitController);
+        AIState nextState = currentState.Tick(this);
         if (nextState != null && nextState != currentState)
         {
-            currentState.OnExit(unitController);
+            currentState.OnExit(this);
             currentState = nextState;
-            currentState.OnEnter(unitController);
+            currentState.OnEnter(this);
         }
     }
 
     private void OnDrawGizmosSelected()
     {
-        Awake();
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, unitController.data.detectionRange);
-        
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, unitController.data.attackRange);
+        if (data != null)
+        {
+           Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, data.detectionRange);
+            
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, data.attackRange); 
+        }
     }
 }
