@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitName: generic
   unitPrefab: {fileID: 0}
-  maxHealth: 1
+  maxHealth: 4
   attackDamage: 1
-  attackRange: 2
-  attackCooldown: 1.5
-  speed: 25
-  angularSpeed: 60
-  acceleration: 8
-  stoppingDistance: 3
-  detectionRange: 10
+  attackRange: 3
+  attackCooldown: 4
+  speed: 15
+  angularSpeed: 100
+  acceleration: 100
+  stoppingDistance: 0.2
+  detectionRange: 15

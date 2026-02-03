@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b5e9f6741386ea4ca83095d44e7da41, type: 3}
   m_Name: AttackState
   m_EditorClassIdentifier: 
+  animationName: Attack
   ifTargetIsDead: {fileID: 11400000, guid: 48130bad44f8bec4f8bf0f58bcaa532e, type: 2}
   ifTargetOutOfRange: {fileID: 11400000, guid: d8876cbb27fa5cf44aa546e51225b26d, type: 2}

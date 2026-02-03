@@ -1,23 +1,20 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-[CreateAssetMenu(fileName = "PatrolState", menuName = "AI/States/Patrol")]
-public class PatrolState : AIState
+[CreateAssetMenu(fileName = "PatrolState", menuName = "State Machine/States/Patrol")]
+public class PatrolState : State
 {
     public float patrolWaitTime = 2f;
-    public AIState ifTargetFound;
-
-    //private Vector3 patrolPoint;
-    //private bool hasPatrolPoint;
-    //private float lastPatrolTime;
+    public State ifTargetFound;
 
     public override void OnEnter(UnitController controller)
     {
+        base.OnEnter(controller);
         controller.lastPatrolTime = -patrolWaitTime; 
         controller.hasPatrolPoint = false;
     }
 
-    public override AIState Tick(UnitController controller)
+    public override State Tick(UnitController controller)
     {
         controller.Target = controller.FindNearestEnemy();
         if (controller.Target != null)
@@ -31,7 +28,6 @@ public class PatrolState : AIState
         }
 
         float distanceFromPatrolPoint = Vector3.Distance(controller.transform.position, controller.patrolPoint);
-        Debug.Log(distanceFromPatrolPoint);
         if (distanceFromPatrolPoint < controller.Agent.stoppingDistance)
         {
             if (Time.time - controller.lastPatrolTime > patrolWaitTime)

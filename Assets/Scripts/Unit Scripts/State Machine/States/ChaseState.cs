@@ -1,12 +1,12 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "ChaseState", menuName = "AI/States/Chase")]
-public class ChaseState : AIState
+[CreateAssetMenu(fileName = "ChaseState", menuName = "State Machine/States/Chase")]
+public class ChaseState : State
 {
-    public AIState ifTargetIsDead;
-    public AIState ifTargetInRange;
+    public State ifTargetIsDead;
+    public State ifTargetInRange;
 
-    public override AIState Tick(UnitController controller)
+    public override State Tick(UnitController controller)
     {
         if (controller.Target == null || controller.Target.CurrentHealth <= 0)
         {

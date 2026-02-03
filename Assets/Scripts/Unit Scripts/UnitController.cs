@@ -1,29 +1,69 @@
-using System.Data.Common;
 using UnityEngine;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
 public class UnitController : MonoBehaviour
 {
+    [Header("Input Data")]
+    public StateMachine stateMachine;
+
+    [Header("Game Data")]
     public UnitData data;
-    private NavMeshAgent agent;
-    public NavMeshAgent Agent => agent;
-    
     public UnitController Target { get; set; }
     public LayerMask enemyLayer;
     public int CurrentHealth { get; private set; }
     public Vector3 patrolPoint { get; set; }
     public bool hasPatrolPoint { get; set; }
     public float lastPatrolTime { get; set; }
+    public float lastAttackTime;
+
+
+    private State currentState;
+    private NavMeshAgent agent;
+    public NavMeshAgent Agent => agent;
+    private Animator animator;
+    public Animator Animator => animator;
+    
 
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+        animator = GetComponent<Animator>();
     }
 
-    protected virtual void Start()
+    private void Start()
     {
         if (data != null) Initialize(data);
+        if (stateMachine != null)
+        {
+            currentState = stateMachine.startingState;
+            if (currentState != null)
+            {
+                currentState.OnEnter(this);
+            }
+        }
+    }
+
+    private void Update()
+    {
+        //check if dead
+        if (currentState == null || CurrentHealth <= 0)
+        {
+            if (CurrentHealth <= 0)
+            {
+                Agent.isStopped = true;
+            }
+            return;
+        }
+
+        //Handle State Machine Tick
+        State nextState = currentState.Tick(this);
+        if (nextState != null && nextState != currentState)
+        {
+            currentState.OnExit(this);
+            currentState = nextState;
+            currentState.OnEnter(this);
+        }
     }
 
     public void Initialize(UnitData unitData)
@@ -36,6 +76,13 @@ public class UnitController : MonoBehaviour
         agent.angularSpeed = data.angularSpeed;
         agent.acceleration = data.acceleration;
         agent.stoppingDistance = data.stoppingDistance;
+    }
+
+    public void PlayAnimation(string animationName, float transitionDuration = 0.1f)
+    {
+        if (string.IsNullOrEmpty(animationName)) { return; }
+        int hash = Animator.StringToHash(animationName);
+        Animator.CrossFade(hash, transitionDuration);
     }
 
     public bool TakeDamage(int damage)
@@ -69,8 +116,6 @@ public class UnitController : MonoBehaviour
         agent.SetDestination(targetPosition);
     }
     
-    // Helper to check if we reached the destination
-    // NavMeshAgent can be tricky; pathPending is true while calculating the path.
     public bool HasReachedDestination()
     {
         if (!agent.pathPending)
@@ -105,5 +150,17 @@ public class UnitController : MonoBehaviour
             }
         }
         return nearestEnemy;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (data != null)
+        {
+           Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, data.detectionRange);
+            
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, data.attackRange); 
+        }
     }
 }

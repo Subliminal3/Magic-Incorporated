@@ -1,13 +1,17 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "AttackState", menuName = "AI/States/Attack")]
-public class AttackState : AIState
+[CreateAssetMenu(fileName = "AttackState", menuName = "State Machine/States/Attack")]
+public class AttackState : State
 {
-    public AIState ifTargetIsDead;
-    public AIState ifTargetOutOfRange;
-    private float lastAttackTime;
+    public State ifTargetIsDead;
+    public State ifTargetOutOfRange;
 
-    public override AIState Tick(UnitController controller)
+    public override void OnEnter(UnitController controller)
+    {
+        controller.lastAttackTime = -controller.data.attackCooldown;
+    }
+
+    public override State Tick(UnitController controller)
     {
         if (controller.Target == null || controller.Target.CurrentHealth <= 0)
         {
@@ -18,10 +22,10 @@ public class AttackState : AIState
 
         FaceTarget(controller);
         
-        if (Time.time - lastAttackTime >= controller.data.attackCooldown)
+        if (Time.time - controller.lastAttackTime >= controller.data.attackCooldown)
         {
             PerformAttack(controller);
-            lastAttackTime = Time.time;
+            controller.lastAttackTime = Time.time;
         }
         
         if (controller.Target == null)
@@ -51,6 +55,8 @@ public class AttackState : AIState
         if (controller.Target == null) return;
         
         bool enemyDied = controller.Target.TakeDamage(controller.data.attackDamage);
+
+        controller.PlayAnimation(animationName);
         
         if (enemyDied)
         {

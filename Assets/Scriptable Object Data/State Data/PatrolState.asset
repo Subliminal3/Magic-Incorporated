@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3293660c1ceb624478c0fae1920279cb, type: 3}
   m_Name: PatrolState
   m_EditorClassIdentifier: 
+  animationName: Patrol
   patrolWaitTime: 2
   ifTargetFound: {fileID: 11400000, guid: d8876cbb27fa5cf44aa546e51225b26d, type: 2}
