@@ -15,7 +15,7 @@ public class UnitController : MonoBehaviour
     public Vector3 patrolPoint { get; set; }
     public bool hasPatrolPoint { get; set; }
     public float lastPatrolTime { get; set; }
-    public float lastAttackTime;
+    public float lastAttackTime { get; set; }
 
 
     private State currentState;

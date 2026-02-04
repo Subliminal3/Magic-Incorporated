@@ -19,7 +19,7 @@ MonoBehaviour:
   attackRange: 3
   attackCooldown: 4
   speed: 15
-  angularSpeed: 100
-  acceleration: 100
+  angularSpeed: 1000
+  acceleration: 20
   stoppingDistance: 0.2
   detectionRange: 15
