@@ -11,13 +11,13 @@ public class UnitData : ScriptableObject
     [Header("Gameplay Stats")]
     public int maxHealth = 1;
     public int attackDamage = 1;
-    public float attackRange = 2;
+    public float attackRange = 4;
     public float attackCooldown = 1.5f;
 
     [Header("NavMesh Settings")]
-    public float speed = 10f;
-    public float angularSpeed = 120f; // How fast it turns
-    public float acceleration = 8f;
-    public float stoppingDistance = 1f; // How close to target before stopping
+    public float speed = 8f;
+    public float angularSpeed = 720f; // How fast it turns
+    public float acceleration = 12f;
+    public float stoppingDistance = 4f; // How close to target before stopping
     public float detectionRange = 10f;
 }

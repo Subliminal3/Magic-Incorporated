@@ -15,12 +15,14 @@ public class UnitController : MonoBehaviour
     public LayerMask enemyLayer;
     public int CurrentHealth { get; private set; }
 
-    
+    public UnitController defaultTarget;
 
 
 
     private State currentState;
     private NavMeshAgent agent;
+    //if the unit is attacking it wont search for more enemies near by
+    private bool isAttacking = false;
 
     [SerializeField] State startingState;
     public NavMeshAgent Agent => agent;
@@ -31,11 +33,14 @@ public class UnitController : MonoBehaviour
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+        
         //animator = GetComponent<Animator>();
     }
 
     private void Start()
     {
+        //set target to default on start
+        target = defaultTarget;
         if (data != null) Initialize(data);
         //if (stateMachine != null)
         //{
@@ -59,7 +64,12 @@ public class UnitController : MonoBehaviour
             return;
         }
 
+        //Runs change state and calls tick of 'startingState'
         ChangeState(currentState.Tick(this));
+
+        //Need to put this on a timer so it doesnt run so often
+        if(!isAttacking)
+            target = FindNearestEnemy();
     }
 
     public void ChangeState(State nextState)
@@ -122,7 +132,7 @@ public class UnitController : MonoBehaviour
     {
         agent.SetDestination(targetPosition);
     }
-    
+
     /*public bool HasReachedDestination()
     {
         if (!agent.pathPending)
@@ -138,25 +148,35 @@ public class UnitController : MonoBehaviour
         return false;
     }*/
 
+
+    
+
     public UnitController FindNearestEnemy()
     {
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, data.detectionRange, enemyLayer);
-        UnitController nearestEnemy = null;
-        float nearestDistance = Mathf.Infinity;
         
-        foreach (var hitCollider in hitColliders)
+        Collider[] hits = Physics.OverlapSphere(transform.position, data.detectionRange, enemyLayer);
+
+        UnitController nearest = defaultTarget;
+        float nearestSqr = float.PositiveInfinity;
+        Vector3 origin = transform.position;
+
+        foreach (var hit in hits)
         {
-            if (hitCollider.transform != transform && hitCollider.GetComponent<UnitController>() != null)
+            UnitController unit = hit.GetComponentInParent<UnitController>();
+            if (unit == null || unit.transform == transform)
+                continue;
+
+            //Target found
+            float sqr = (unit.transform.position - origin).sqrMagnitude;
+            if (sqr < nearestSqr)
             {
-                float distance = Vector3.Distance(transform.position, hitCollider.transform.position);
-                if (distance < nearestDistance)
-                {
-                    nearestDistance = distance;
-                    nearestEnemy = hitCollider.GetComponent<UnitController>();
-                }
+                nearestSqr = sqr;
+                nearest = unit;
+                isAttacking = true;
             }
         }
-        return nearestEnemy;
+
+        return nearest;
     }
 
     private void OnDrawGizmosSelected()

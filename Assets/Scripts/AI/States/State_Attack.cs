@@ -13,7 +13,7 @@ public class State_Attack : State
     }
 
     //Stop the navmesh from moving
-    public void Enter()
+    public override void OnEnter(UnitController ai)
     {
         ai.Agent.isStopped = true;
 
@@ -29,7 +29,7 @@ public class State_Attack : State
         //check for target
         if (ai.target == null)
         {
-            return ai.transitionStates.idleState;
+            return ai.transitionStates.moveState;
         }
 
         float distance = Vector3.Distance(ai.transform.position, ai.target.transform.position);
@@ -44,10 +44,6 @@ public class State_Attack : State
 
     }
 
-    public void Exit()
-    {
-
-    }
 
 
 

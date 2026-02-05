@@ -5,21 +5,16 @@ public class State_Move : State
 {
     UnitController ai;
 
-    public State_Move(UnitController ai)
-    {
-        this.ai = ai;
-    }
-
     public override void OnEnter(UnitController ai)
     {
         ai.Agent.isStopped = false;
     }
     public override State Tick(UnitController ai)
     {
-        //Transition to idle if no target
+        //Target is reset to default if no target
         if (ai.target == null)
         {
-            return ai.transitionStates.idleState;
+            ai.target = ai.defaultTarget;
         }
 
         ai.Agent.SetDestination(ai.target.transform.position);
