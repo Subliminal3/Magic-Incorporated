@@ -6095,6 +6095,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2008665999}
   - component: {fileID: 2008665998}
+  - component: {fileID: 2008666000}
   m_Layer: 0
   m_Name: Ally_melee
   m_TagString: Untagged
@@ -6140,6 +6141,24 @@ Transform:
   - {fileID: 160577566}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -359.995, z: 0}
+--- !u!114 &2008666000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2008665997}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b328c78e2a74e8945b46f7ea061f2de9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  transitionStates: {fileID: 11400000, guid: 7f61b4dd890d7ff44a48185cf8115fa4, type: 2}
+  data: {fileID: 0}
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  startingState: {fileID: 0}
 --- !u!1 &2068696970
 GameObject:
   m_ObjectHideFlags: 0
