@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cb2304e01b45144b91e70667bbc838a, type: 3}
+  m_Name: Allly_Melee
+  m_EditorClassIdentifier: 
+  unitName: 
+  unitPrefab: {fileID: 0}
+  maxHealth: 1
+  attackDamage: 1
+  attackRange: 5
+  attackCooldown: 1.5
+  speed: 6
+  angularSpeed: 720
+  acceleration: 12
+  stoppingDistance: 4.8
+  detectionRange: 10
