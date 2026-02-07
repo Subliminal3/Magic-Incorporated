@@ -63,6 +63,7 @@ public class UnitController : MonoBehaviour
         if(currentState != null)
             ChangeState(currentState.Tick(this));
 
+       
         //Need to put this on a timer so it doesnt run so often
         if(!isAttacking && currentState != null)
             target = FindNearestEnemy();
