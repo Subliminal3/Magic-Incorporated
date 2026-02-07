@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitName: 
   unitPrefab: {fileID: 0}
-  maxHealth: 1
+  maxHealth: 2
   attackDamage: 1
   attackRange: 5
-  attackCooldown: 1.5
+  attackSpeed: 1.5
   speed: 6
   angularSpeed: 720
   acceleration: 12
