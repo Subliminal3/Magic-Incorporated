@@ -11,12 +11,11 @@ public class UnitController : MonoBehaviour
 
     [Header("Game Data")]
     public UnitData data;
+    
     public UnitController target { get; set; }
+    public int CurrentHealth { get; set; }
     public LayerMask enemyLayer;
-    public int CurrentHealth { get; private set; }
-
     public UnitController defaultTarget;
-
 
 
     private State currentState;
@@ -54,21 +53,14 @@ public class UnitController : MonoBehaviour
 
     private void Update()
     {
-        //check if dead
-        if (currentState == null || CurrentHealth <= 0)
-        {
-            if (CurrentHealth <= 0)
-            {
-                Agent.isStopped = true;
-            }
-            return;
-        }
+        //if(IsDead()) return;
 
         //Runs change state and calls tick of 'startingState'
-        ChangeState(currentState.Tick(this));
+        if(currentState != null)
+            ChangeState(currentState.Tick(this));
 
         //Need to put this on a timer so it doesnt run so often
-        if(!isAttacking)
+        if(!isAttacking && currentState != null)
             target = FindNearestEnemy();
     }
 
@@ -102,31 +94,39 @@ public class UnitController : MonoBehaviour
         Animator.CrossFade(hash, transitionDuration);
     }*/
 
-    public bool TakeDamage(int damage)
+    public void DealDamage(int damage)
     {
-        if (CurrentHealth <= 0)
-            return false; // Already dead
+        if (target == null) return;
+        target.CurrentHealth -= damage;
 
-        CurrentHealth -= damage;
-        Debug.Log($"{name} takes {damage} damage. Health: {CurrentHealth}/{data.maxHealth}");
+        if (target.CurrentHealth <= 0)
+            Die();
 
+        //target.TakeDamage(damage);
+    }
+
+/*    public void TakeDamage(int damage)
+    {
+        if (CurrentHealth <= 0) return;
+
+        CurrentHealth = Mathf.Max(CurrentHealth - damage, 0);
+
+        if (CurrentHealth == 0)
+            Die();
+    }*/
+
+    public void Die()
+    {
+        //check if dead
         if (CurrentHealth <= 0)
         {
-            Die();
-            return true;
+            Debug.Log($"{name} has been defeated!");
+            agent.isStopped = true;
+            gameObject.SetActive(false);
+            //add death anim here
         }
-
-        return false;
     }
 
-    private void Die()
-    {
-        Debug.Log($"{name} has been defeated!");
-        agent.isStopped = true;
-        // You can add death animations, particle effects, etc. here
-        // For now, we'll just disable the unit
-        gameObject.SetActive(false);
-    }
 
     public void MoveTo(Vector3 targetPosition)
     {

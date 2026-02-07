@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "NewUnitData", menuName = "Units/Unit Data")]
@@ -12,7 +13,7 @@ public class UnitData : ScriptableObject
     public int maxHealth = 1;
     public int attackDamage = 1;
     public float attackRange = 4;
-    public float attackCooldown = 1.5f;
+    public float attackSpeed = 1.5f;
 
     [Header("NavMesh Settings")]
     public float speed = 8f;
@@ -20,4 +21,6 @@ public class UnitData : ScriptableObject
     public float acceleration = 12f;
     public float stoppingDistance = 4f; // How close to target before stopping
     public float detectionRange = 10f;
+
+    
 }

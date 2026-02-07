@@ -5,44 +5,41 @@ using UnityEngine;
 public class State_Attack : State
 {
     UnitController ai;
-
-    //constructor
-    public State_Attack(UnitController ai)
-    {
-        this.ai = ai;
-    }
+    private float nextAttackTime;
 
     //Stop the navmesh from moving
     public override void OnEnter(UnitController ai)
     {
         ai.Agent.isStopped = true;
+        nextAttackTime = 0f; // attack immediately on enter
 
-        if (ai.target != null)
-        {
-            //targetStats = ai.target.GetComponent<UnitStats>();
-            //Debug.Log("Component found");
-        }
     }
 
     public override State Tick(UnitController ai)
     {
         //check for target
         if (ai.target == null)
-        {
             return ai.transitionStates.moveState;
-        }
 
+        //Check if they move out of attack range
         float distance = Vector3.Distance(ai.transform.position, ai.target.transform.position);
-
         if (distance > ai.data.attackRange)
-        {
             return ai.transitionStates.moveState;
+
+        //Reduce target hp on a timer
+        float interval = 1f / Mathf.Max(ai.data.attackSpeed, 0.01f);
+
+        if(Time.time >= nextAttackTime)
+        {
+            ai.DealDamage(ai.data.attackDamage);
+            nextAttackTime = Time.time + interval;
         }
 
         return this;
 
 
     }
+
 
 
 
