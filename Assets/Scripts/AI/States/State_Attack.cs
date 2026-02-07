@@ -5,14 +5,13 @@ using UnityEngine;
 public class State_Attack : State
 {
     UnitController ai;
-    private float nextAttackTime;
 
     //Stop the navmesh from moving
     public override void OnEnter(UnitController ai)
     {
         ai.Agent.isStopped = true;
-        nextAttackTime = 0f; // attack immediately on enter
-
+        ai.nextAttackTime = 0;
+        ai.isAttacking = true;
     }
 
     public override State Tick(UnitController ai)
@@ -27,19 +26,22 @@ public class State_Attack : State
             return ai.transitionStates.moveState;
 
         //Reduce target hp on a timer
-        float interval = 1f / Mathf.Max(ai.data.attackSpeed, 0.01f);
+        ai.DealDamage();
 
-        if(Time.time >= nextAttackTime)
-        {
-            ai.DealDamage(ai.data.attackDamage);
-            nextAttackTime = Time.time + interval;
-        }
+        
+
+        if(ai.target.isDead)
+            return ai.transitionStates.moveState;
 
         return this;
 
 
     }
 
+    public override void OnExit(UnitController ai)
+    {
+        ai.isAttacking = false;
+    }
 
 
 

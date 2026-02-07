@@ -16,12 +16,16 @@ public class UnitController : MonoBehaviour
     public int CurrentHealth { get; set; }
     public LayerMask enemyLayer;
     public UnitController defaultTarget;
-
+    public bool isDead = false;
+    public float nextAttackTime;
+    public bool isAttacking = false;
 
     private State currentState;
     private NavMeshAgent agent;
+    private bool cleanedUp = false;
     //if the unit is attacking it wont search for more enemies near by
-    private bool isAttacking = false;
+
+
 
     [SerializeField] State startingState;
     public NavMeshAgent Agent => agent;
@@ -94,18 +98,23 @@ public class UnitController : MonoBehaviour
         Animator.CrossFade(hash, transitionDuration);
     }*/
 
-    public void DealDamage(int damage)
+    public void DealDamage()
     {
         if (target == null) return;
-        target.CurrentHealth -= damage;
 
-        if (target.CurrentHealth <= 0)
-            Die();
+        float interval = 1f / Mathf.Max(data.attackSpeed, 0.01f);
 
-        //target.TakeDamage(damage);
+        if (Time.time >= nextAttackTime)
+        {
+            target.TakeDamage(data.attackDamage);
+            nextAttackTime = Time.time + interval;
+        }
+
+        if (target.isDead)
+            target = defaultTarget;
     }
 
-/*    public void TakeDamage(int damage)
+    public void TakeDamage(int damage)
     {
         if (CurrentHealth <= 0) return;
 
@@ -113,19 +122,38 @@ public class UnitController : MonoBehaviour
 
         if (CurrentHealth == 0)
             Die();
-    }*/
+    }
 
     public void Die()
     {
         //check if dead
         if (CurrentHealth <= 0)
         {
+            //isAttacking = false;   
             Debug.Log($"{name} has been defeated!");
+            isDead = true;
             agent.isStopped = true;
             gameObject.SetActive(false);
             //add death anim here
         }
     }
+
+
+//The forcecleanup method ensures the exit statement is called when the unit is destroyed (killed)
+/*    void OnDisable() => ForceCleanup();
+    void OnDestroy() => ForceCleanup();
+
+    void ForceCleanup()
+    {
+        if (cleanedUp) return;
+        cleanedUp = true;
+
+        // ensure state exits even if destroyed
+        currentState?.OnExit(this);
+
+    }*/
+    
+
 
 
     public void MoveTo(Vector3 targetPosition)
@@ -172,7 +200,7 @@ public class UnitController : MonoBehaviour
             {
                 nearestSqr = sqr;
                 nearest = unit;
-                isAttacking = true;
+
             }
         }
 
