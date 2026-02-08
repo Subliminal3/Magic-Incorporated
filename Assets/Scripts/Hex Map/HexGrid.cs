@@ -1,53 +1,51 @@
 using UnityEngine;
-using System.Collections.Generic;
-using Unity.VisualScripting;
-using Unity.Mathematics;
-
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class HexGrid : MonoBehaviour
 {
-    [SerializeField] GameObject hex_tile;
-    Dictionary<HexCoords, HexCell> hex_grid;
-    [SerializeField] int map_size;
-    [SerializeField] float outerRadius;
-    [SerializeField] float spacing;
-    public TileTypeSO[] tilePalette;
+    [SerializeField] private GameObject hex_tile; // MUST be the prefab asset from Project window
+    [SerializeField] private int map_size;
+    [SerializeField] private float outerRadius;
+    [SerializeField] private float spacing;
 
     [ContextMenu("Generate Map")]
     void GenerateMap()
     {
-        // Inner radius math: r = R * cos(30 degrees)
         float innerRadius = outerRadius * 0.866025404f;
         int height = map_size;
         int width = map_size;
+
         GameObject hex_map = new GameObject("hex map");
         hex_map.transform.SetParent(this.transform, false);
-        //hex_map.transform.position += new Vector3(width * innerRadius * 2f, 0, height * outerRadius * 1.5f);
 
         for (int z = 0; z < height; z++)
         {
             for (int x = 0; x < width; x++)
             {
-                Vector3 position;
-
-                // Horizontal distance between hex centers is 2 * innerRadius
-                // Every odd row (z % 2 != 0) is offset by 1 innerRadius
                 float xPos = x * (innerRadius * 2f);
-                if (z % 2 != 0)
-                {
-                    xPos += innerRadius;
-                }
+                if (z % 2 != 0) xPos += innerRadius;
 
-                // Vertical distance between rows is 1.5 * outerRadius
                 float zPos = z * (outerRadius * 1.5f);
 
-                position = new Vector3(xPos, 0, zPos) * spacing;
+                Vector3 position = new Vector3(xPos, 0, zPos) * spacing;
 
-                GameObject hex = Instantiate(hex_tile, position, Quaternion.Euler(90,0,0));
-                hex.transform.SetParent(hex_map.transform); 
+                GameObject hex;
+
+#if UNITY_EDITOR
+                // Editor-safe prefab instance (keeps the link)
+                hex = (GameObject)PrefabUtility.InstantiatePrefab(hex_tile, hex_map.transform);
+                hex.transform.localPosition = position;
+                hex.transform.localRotation = Quaternion.Euler(90, 0, 0);
+#else
+                // Runtime instantiate
+                hex = Instantiate(hex_tile, position, Quaternion.Euler(90, 0, 0), hex_map.transform);
+                hex.transform.localPosition = position;
+#endif
+
                 hex.name = $"Hex_{x}_{z}";
             }
         }
     }
 }
-

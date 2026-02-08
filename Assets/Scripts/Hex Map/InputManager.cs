@@ -3,60 +3,107 @@ using UnityEngine;
 public class InputManager : MonoBehaviour
 {
     [SerializeField] private LayerMask tileLayer;
+    [SerializeField] private string highlightChildName = "Highlight";
 
-    [Header("Materials")]
-    [SerializeField] private Material highlightMaterial;
+    private Transform hoveredTileRoot;
+    private GameObject hoveredHighlight;
 
-    private Renderer lastRenderer;
-    private Material originalMaterial;
+    private Transform selectedTileRoot;
+    private GameObject selectedHighlight;
 
     void Update()
     {
-        DetectTile();
+        // Tab clears the locked selection
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            ClearSelection();
+            // After clearing, hover will work again this frame
+        }
+
+        DetectTileHover();
+
+        // Click locks selection (keeps highlight until Tab)
+        if (Input.GetMouseButtonDown(0) && selectedTileRoot == null && hoveredTileRoot != null)
+        {
+            SelectHovered();
+        }
     }
 
-    void DetectTile()
+    void DetectTileHover()
     {
+        // If a tile is selected, we don't change hover highlight
+        if (selectedTileRoot != null)
+            return;
+
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
         if (Physics.Raycast(ray, out RaycastHit hit, 100f, tileLayer))
         {
-            // IMPORTANT: collider might be on a child
-            Renderer currentRenderer = hit.collider.GetComponentInParent<Renderer>();
+            Transform tileRoot = FindTileRootWithHighlight(hit.collider.transform);
 
-            if (currentRenderer != lastRenderer)
+            if (tileRoot != hoveredTileRoot)
             {
-                ClearHighlight();
-                Highlight(currentRenderer);
+                ClearHover();
+                SetHover(tileRoot);
             }
         }
         else
         {
-            ClearHighlight();
+            ClearHover();
         }
     }
 
-    void Highlight(Renderer rend)
+    Transform FindTileRootWithHighlight(Transform start)
     {
-        if (rend == null || highlightMaterial == null) return;
-
-        lastRenderer = rend;
-
-        // Cache original material
-        originalMaterial = rend.material;
-
-        // Swap to highlight material
-        rend.material = highlightMaterial;
+        Transform t = start;
+        while (t != null)
+        {
+            if (t.Find(highlightChildName) != null)
+                return t;
+            t = t.parent;
+        }
+        return start;
     }
 
-    void ClearHighlight()
+    void SetHover(Transform tileRoot)
     {
-        if (lastRenderer == null) return;
+        if (tileRoot == null) return;
 
-        // Restore original material
-        lastRenderer.material = originalMaterial;
+        Transform h = tileRoot.Find(highlightChildName);
+        if (h == null) return;
 
-        lastRenderer = null;
-        originalMaterial = null;
+        h.gameObject.SetActive(true);
+        hoveredTileRoot = tileRoot;
+        hoveredHighlight = h.gameObject;
+    }
+
+    void ClearHover()
+    {
+        if (hoveredHighlight != null)
+            hoveredHighlight.SetActive(false);
+
+        hoveredHighlight = null;
+        hoveredTileRoot = null;
+    }
+
+    void SelectHovered()
+    {
+        // Lock the currently hovered tile
+        selectedTileRoot = hoveredTileRoot;
+        selectedHighlight = hoveredHighlight;
+
+        // Prevent hover system from turning it off later
+        
+    }
+
+    void ClearSelection()
+    {
+        if (selectedHighlight != null)
+            selectedHighlight.SetActive(false);
+
+        selectedHighlight = null;
+        selectedTileRoot = null;
+        hoveredTileRoot = null;
+        hoveredHighlight = null;
     }
 }
