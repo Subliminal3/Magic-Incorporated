@@ -523,71 +523,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9ad1ca1988092af488173b1245149254, type: 3}
---- !u!1 &75413228
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 75413230}
-  - component: {fileID: 75413229}
-  - component: {fileID: 75413231}
-  m_Layer: 0
-  m_Name: InputManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &75413229
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 75413228}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3fd12c8f4db7d7c45abfe757a327ee73, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tileLayer:
-    serializedVersion: 2
-    m_Bits: 1024
-  highlightChildName: Highlight
---- !u!4 &75413230
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 75413228}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &75413231
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 75413228}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 024e907639417da4cb68f9c3b10553c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  myUnit: {fileID: 0}
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 8
 --- !u!1001 &79786653
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1706,7 +1641,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &399373521
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6325,6 +6260,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1563274832}
   - component: {fileID: 1563274831}
+  - component: {fileID: 1563274833}
   m_Layer: 0
   m_Name: HexGridManager
   m_TagString: Untagged
@@ -6364,6 +6300,22 @@ Transform:
   - {fileID: 549031887}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1563274833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1563274830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd12c8f4db7d7c45abfe757a327ee73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tileLayer:
+    serializedVersion: 2
+    m_Bits: 1024
+  highlightChildName: Highlight
 --- !u!1001 &1569534070
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8793,7 +8745,7 @@ MonoBehaviour:
     m_Bits: 1024
   focusOffset: {x: 0, y: 0, z: 0}
   camTransform: {fileID: 762590221}
-  zoomInDistance: 2
+  zoomInDistance: 1
   moveSmoothness: 3
   zoomCanvas: {fileID: 399373520}
   zoomCompleteThreshold: 0.05
@@ -9063,7 +9015,6 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 2098000166}
-  - {fileID: 75413230}
   - {fileID: 2096159450}
   - {fileID: 1563274832}
   - {fileID: 515405443}
