@@ -2,79 +2,96 @@ using UnityEngine;
 
 public class MapCam : MonoBehaviour
 {
-    [Header("Rotation & Pitch")]
-    public float rotationSpeed = 100f;
-    public float pitchSpeed = 80f;
-    public float smoothness = 5f;
-    public float minPitch = 30f; // Don't look too flat
-    public float maxPitch = 80f; // Don't look straight down
+    [Header("Click Targeting")]
+    public Camera raycastCamera;
+    public LayerMask clickableMask = ~0;     // set to only the stuff you want clickable
+    public bool useRootObject = false;        // if you click a child collider, zoom to the root
+    public Vector3 focusOffset = Vector3.zero; // e.g. (0,1,0) to focus above the object
 
-    [Header("Zoom")]
-    public Transform camTransform; 
-    public float zoomSpeed = 10f;
-    public float minZoom = 5f;
-    public float maxZoom = 25f;
+    [Header("Zoom Settings")]
+    public Transform camTransform;
+    public float zoomInDistance = 8f;
+    public float zoomPitch = 60f;
+    public float moveSmoothness = 6f;
 
-    private float _targetYaw;
-    private float _targetPitch;
-    private float _targetZoom;
+    // Home state
+    private Vector3 _homePivotPos;
+    private Quaternion _homePivotRot;
+    private Vector3 _homeCamLocalPos;
+    private Quaternion _homeCamLocalRot;
+
+    // Targets
+    private Vector3 _targetPivotPos;
+    private Quaternion _targetPivotRot;
+    private Vector3 _targetCamLocalPos;
+    private Quaternion _targetCamLocalRot;
 
     void Start()
     {
-        _targetYaw = transform.eulerAngles.y;
-        _targetPitch = camTransform.localEulerAngles.x;
-        _targetZoom = camTransform.localPosition.magnitude;
+        if (raycastCamera == null) raycastCamera = Camera.main;
+
+        _homePivotPos = transform.position;
+        _homePivotRot = transform.rotation;
+
+        _homeCamLocalPos = camTransform.localPosition;
+        _homeCamLocalRot = camTransform.localRotation;
+
+        _targetPivotPos = _homePivotPos;
+        _targetPivotRot = _homePivotRot;
+        _targetCamLocalPos = _homeCamLocalPos;
+        _targetCamLocalRot = _homeCamLocalRot;
     }
 
     void Update()
     {
-        HandleInputs();
+        if (Input.GetMouseButtonDown(0))
+            TryZoomToClickedObject();
+
+        if (Input.GetKeyDown(KeyCode.Tab))
+            ReturnHome();
+
         ApplySmoothing();
     }
 
-    void HandleInputs()
+    void TryZoomToClickedObject()
     {
-        // Orbit and Pitch when holding Right Mouse Button
-        if (Input.GetMouseButton(1))
-        {
-            _targetYaw += Input.GetAxis("Mouse X") * rotationSpeed * Time.deltaTime;
-            
-            // Invert the Mouse Y for natural "pull to tilt" feeling
-            _targetPitch -= Input.GetAxis("Mouse Y") * pitchSpeed * Time.deltaTime;
-            _targetPitch = Mathf.Clamp(_targetPitch, minPitch, maxPitch);
+        if (raycastCamera == null) return;
 
-            Cursor.lockState = CursorLockMode.Locked;
-        }
-        if (Input.GetMouseButtonUp(1))
-        {
-            Cursor.lockState = CursorLockMode.None;
-        }
+        Ray ray = raycastCamera.ScreenPointToRay(Input.mousePosition);
 
-        // Zoom logic
-        float scroll = Input.GetAxis("Mouse ScrollWheel");
-        _targetZoom -= scroll * zoomSpeed;
-        _targetZoom = Mathf.Clamp(_targetZoom, minZoom, maxZoom);
+        if (Physics.Raycast(ray, out RaycastHit hit, 10000f, clickableMask, QueryTriggerInteraction.Ignore))
+        {
+            Transform clicked = hit.collider.transform; // IMPORTANT
+
+            //if (useRootObject) clicked = clicked.root;
+
+            Vector3 focusPoint = clicked.position + focusOffset;
+
+            _targetPivotPos = focusPoint;
+            _targetPivotRot = Quaternion.Euler(0f, transform.eulerAngles.y, 0f);
+
+            _targetCamLocalRot = camTransform.localRotation; // no tilt change
+            _targetCamLocalPos = _targetCamLocalRot * Vector3.back * zoomInDistance;
+        }
+    }
+
+
+    void ReturnHome()
+    {
+        _targetPivotPos = _homePivotPos;
+        _targetPivotRot = _homePivotRot;
+        _targetCamLocalPos = _homeCamLocalPos;
+        _targetCamLocalRot = _homeCamLocalRot;
     }
 
     void ApplySmoothing()
     {
-        // 1. Rotate the Pivot (Left/Right)
-        float currentYaw = Mathf.LerpAngle(transform.eulerAngles.y, _targetYaw, Time.deltaTime * smoothness);
-        transform.rotation = Quaternion.Euler(0, currentYaw, 0);
+        float t = Time.deltaTime * moveSmoothness;
 
-        // 2. Rotate the Camera itself (Up/Down)
-        float currentPitch = Mathf.LerpAngle(camTransform.localEulerAngles.x, _targetPitch, Time.deltaTime * smoothness);
-        camTransform.localRotation = Quaternion.Euler(currentPitch, 0, 0);
+        transform.position = Vector3.Lerp(transform.position, _targetPivotPos, t);
+        transform.rotation = Quaternion.Slerp(transform.rotation, _targetPivotRot, t);
 
-        // 3. Move the Camera (Orbit around pivot)
-        // Smoothly interpolate the zoom distance separately
-        float currentDist = Vector3.Distance(transform.position, camTransform.position);
-        float targetDist = Mathf.Lerp(currentDist, _targetZoom, Time.deltaTime * smoothness);
-
-        // Calculate the orbit position relative to the pivot:
-        // Take the rotation from Step 2 (Pitch) and extend backward by the zoom distance.
-        // Since we are setting localPosition relative to the Yaw-rotated parent, 
-        // we only need to apply the local Pitch rotation here.
-        camTransform.localPosition = camTransform.localRotation * Vector3.back * targetDist;
+        camTransform.localPosition = Vector3.Lerp(camTransform.localPosition, _targetCamLocalPos, t);
+        camTransform.localRotation = Quaternion.Slerp(camTransform.localRotation, _targetCamLocalRot, t);
     }
 }
