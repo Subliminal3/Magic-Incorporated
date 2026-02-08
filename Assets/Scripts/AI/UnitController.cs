@@ -22,8 +22,7 @@ public class UnitController : MonoBehaviour
 
     private State currentState;
     private NavMeshAgent agent;
-    private bool cleanedUp = false;
-    //if the unit is attacking it wont search for more enemies near by
+
 
 
 
@@ -63,8 +62,9 @@ public class UnitController : MonoBehaviour
         if(currentState != null)
             ChangeState(currentState.Tick(this));
 
+        //if the unit is attacking it wont search for more enemies near by
         //Need to put this on a timer so it doesnt run so often
-        if(!isAttacking && currentState != null)
+        if (!isAttacking && currentState != null)
             target = FindNearestEnemy();
     }
 

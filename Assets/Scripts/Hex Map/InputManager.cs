@@ -2,9 +2,13 @@ using UnityEngine;
 
 public class InputManager : MonoBehaviour
 {
-    [SerializeField]
-    private LayerMask tileLayer; // Set this in the Inspector to your "Tiles" layer
-    private GameObject lastHighlightedTile;
+    [SerializeField] private LayerMask tileLayer;
+
+    [Header("Materials")]
+    [SerializeField] private Material highlightMaterial;
+
+    private Renderer lastRenderer;
+    private Material originalMaterial;
 
     void Update()
     {
@@ -13,19 +17,17 @@ public class InputManager : MonoBehaviour
 
     void DetectTile()
     {
-        // Create a ray from the camera through the mouse position
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, 100f, tileLayer))
+        if (Physics.Raycast(ray, out RaycastHit hit, 100f, tileLayer))
         {
-            GameObject currentTile = hit.collider.gameObject;
+            // IMPORTANT: collider might be on a child
+            Renderer currentRenderer = hit.collider.GetComponentInParent<Renderer>();
 
-            // Only act if we've moved to a NEW tile
-            if (currentTile != lastHighlightedTile)
+            if (currentRenderer != lastRenderer)
             {
                 ClearHighlight();
-                HighlightTile(currentTile);
+                Highlight(currentRenderer);
             }
         }
         else
@@ -34,19 +36,27 @@ public class InputManager : MonoBehaviour
         }
     }
 
-    void HighlightTile(GameObject tile)
+    void Highlight(Renderer rend)
     {
-        lastHighlightedTile = tile;
-        // Example: Change color or enable a highlight child object
-        tile.GetComponent<Renderer>().material.color = Color.yellow;
+        if (rend == null || highlightMaterial == null) return;
+
+        lastRenderer = rend;
+
+        // Cache original material
+        originalMaterial = rend.material;
+
+        // Swap to highlight material
+        rend.material = highlightMaterial;
     }
 
     void ClearHighlight()
     {
-        if (lastHighlightedTile != null)
-        {
-            lastHighlightedTile.GetComponent<Renderer>().material.color = Color.white;
-            lastHighlightedTile = null;
-        }
+        if (lastRenderer == null) return;
+
+        // Restore original material
+        lastRenderer.material = originalMaterial;
+
+        lastRenderer = null;
+        originalMaterial = null;
     }
 }
