@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Allly_Melee
   m_EditorClassIdentifier: 
   unitName: 
-  unitPrefab: {fileID: 0}
+  unitPrefab: {fileID: 3492315289329681888, guid: 02d0a9c41b981a940a161e9c330d7437, type: 3}
   maxHealth: 25
   attackDamage: 1
   attackRange: 5

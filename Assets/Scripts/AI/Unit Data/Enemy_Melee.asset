@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Enemy_Melee
   m_EditorClassIdentifier: 
   unitName: 
-  unitPrefab: {fileID: 0}
+  unitPrefab: {fileID: 4819935240474214334, guid: 060a1b86456de474b8a97d517a5ddc41, type: 3}
   maxHealth: 2
   attackDamage: 1
   attackRange: 5

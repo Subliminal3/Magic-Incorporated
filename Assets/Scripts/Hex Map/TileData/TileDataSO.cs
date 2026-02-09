@@ -13,13 +13,17 @@ public class TileDataSO : ScriptableObject
 {
     [Header("Visuals")]
     public string tileName;
-    public GameObject prefab; // The 3D model for this hex
+    public GameObject tilePrefab; // The 3D model for this hex
 
     [Header("Gameplay")]
     public BattleType battleType;
 
-    [Header("Units")]
-    public List<UnitSpawnEntry> unitSpawns = new();
+    [Header("Ally Units")]
+    public List<UnitSpawnEntry> allyUnits = new();
+
+    [Header("Enemy Units")]
+    public List<UnitSpawnEntry> enemyUnits = new();
+
 
     //Optional to prevent duplicate spawns
     /*public int GetCount(UnitData unit)
@@ -29,15 +33,16 @@ public class TileDataSO : ScriptableObject
         return 0;
     }*/
 
-
 }
 
 //New class that allows setting a unit and how many of that type
 [Serializable]
 public class UnitSpawnEntry
 {
-    public UnitData unit;
-    public int count;
+    public GameObject unitPrefab;
+
+    //min prevents negative values
+    [Min(0)] public int count;
 
 
 }

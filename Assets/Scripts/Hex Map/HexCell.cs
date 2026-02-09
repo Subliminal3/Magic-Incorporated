@@ -22,9 +22,9 @@ public class HexCell : MonoBehaviour
         foreach(Transform child in transform) Destroy(child.gameObject);
 
         // 2. Instantiate new model if it exists
-        if (_tileType.prefab != null)
+        if (_tileType.tilePrefab != null)
         {
-            Instantiate(_tileType.prefab, transform);
+            Instantiate(_tileType.tilePrefab, transform);
         }
     }
 }

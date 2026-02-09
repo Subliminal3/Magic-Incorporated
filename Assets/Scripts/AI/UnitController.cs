@@ -1,4 +1,3 @@
-using UnityEditor.ShaderGraph.Configuration;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -16,14 +15,13 @@ public class UnitController : MonoBehaviour
     public UnitController target { get; set; }
     public int CurrentHealth { get; set; }
     public LayerMask enemyLayer;
-    public UnitController defaultTarget;
     public bool isDead = false;
     public float nextAttackTime;
     public bool isAttacking = false;
+    public UnitController defaultTarget;
 
     private State currentState;
     private NavMeshAgent agent;
-    //if the unit is attacking it wont search for more enemies near by
 
 
 

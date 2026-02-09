@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: TileType
   m_EditorClassIdentifier: 
   tileName: 
-  prefab: {fileID: 0}
+  tilePrefab: {fileID: 0}
   battleType: 0
-  unitSpawns:
-  - unit: {fileID: 11400000, guid: feb235428e9922540b4d523319083a80, type: 2}
+  allyUnits:
+  - unitPrefab: {fileID: 3492315289329681888, guid: 02d0a9c41b981a940a161e9c330d7437, type: 3}
+    count: 3
+  enemyUnits:
+  - unitPrefab: {fileID: 4819935240474214334, guid: 060a1b86456de474b8a97d517a5ddc41, type: 3}
     count: 3
