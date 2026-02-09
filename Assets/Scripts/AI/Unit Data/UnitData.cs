@@ -21,6 +21,7 @@ public class UnitData : ScriptableObject
     public float acceleration = 12f;
     public float stoppingDistance = 4f; // How close to target before stopping
     public float detectionRange = 10f;
+    public TargetType defaultTargetType;
 
     
 }

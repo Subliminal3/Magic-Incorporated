@@ -6284,6 +6284,7 @@ MonoBehaviour:
   map_size: 13
   outerRadius: 1
   spacing: 1.05
+  tilePalette: []
 --- !u!4 &1563274832
 Transform:
   m_ObjectHideFlags: 0

@@ -1,3 +1,4 @@
+using UnityEditor.ShaderGraph.Configuration;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -42,6 +43,8 @@ public class UnitController : MonoBehaviour
     private void Start()
     {
         //set target to default on start
+
+        defaultTarget = ResolveDefaultTarget();
         target = defaultTarget;
         if (data != null) Initialize(data);
         //if (stateMachine != null)
@@ -52,6 +55,23 @@ public class UnitController : MonoBehaviour
                 currentState.OnEnter(this);
             }
         //}
+    }
+    //This function uses the TargetFinder singleton to determine the default target of the prefab using the defaultTargetType in unit data
+    UnitController ResolveDefaultTarget()
+    {
+        switch (data.defaultTargetType)
+        {
+            case TargetType.Player:
+                return TargetFinder.Instance.player;
+
+            case TargetType.Portal:
+                return TargetFinder.Instance.portal;
+
+            //Optional to create list of enemies and allies when they are spawned and attack nearest enemy
+            //case TargetType.NearestEnemy:
+                //return FindNearestEnemy(TargetFinder.Instance.enemies);
+        }
+        return null;
     }
 
     private void Update()

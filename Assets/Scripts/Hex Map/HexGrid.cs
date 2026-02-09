@@ -11,7 +11,7 @@ public class HexGrid : MonoBehaviour
     [SerializeField] int map_size;
     [SerializeField] float outerRadius;
     [SerializeField] float spacing;
-    public TileTypeSO[] tilePalette;
+    public TileDataSO[] tilePalette;
 
     [ContextMenu("Generate Map")]
     void GenerateMap()

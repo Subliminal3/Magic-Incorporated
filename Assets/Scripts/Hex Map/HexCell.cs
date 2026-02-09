@@ -7,10 +7,10 @@ public class HexCell : MonoBehaviour
     private HexCoords coords;
     public HexCoords Coords => coords;
     [Header("Data")]
-    [SerializeField] private TileTypeSO _tileType;
-    public TileTypeSO TileType => _tileType;
+    [SerializeField] private TileDataSO _tileType;
+    public TileDataSO TileType => _tileType;
 
-    public void setType(TileTypeSO newType)
+    public void setType(TileDataSO newType)
     {
         _tileType=newType;
         RefreshVisuals();
