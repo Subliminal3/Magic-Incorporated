@@ -22,7 +22,6 @@ public class UnitController : MonoBehaviour
 
     private State currentState;
     private NavMeshAgent agent;
-    private bool cleanedUp = false;
     //if the unit is attacking it wont search for more enemies near by
 
 
@@ -99,6 +98,7 @@ public class UnitController : MonoBehaviour
         Animator.CrossFade(hash, transitionDuration);
     }*/
 
+    //Deal damage calls the take damage function from the targets unit controller
     public void DealDamage()
     {
         if (target == null) return;
@@ -115,6 +115,7 @@ public class UnitController : MonoBehaviour
             target = defaultTarget;
     }
 
+    //Take damage is called from the attackers unit controller
     public void TakeDamage(int damage)
     {
         if (CurrentHealth <= 0) return;
@@ -139,46 +140,10 @@ public class UnitController : MonoBehaviour
         }
     }
 
-
-//The forcecleanup method ensures the exit statement is called when the unit is destroyed (killed)
-/*    void OnDisable() => ForceCleanup();
-    void OnDestroy() => ForceCleanup();
-
-    void ForceCleanup()
-    {
-        if (cleanedUp) return;
-        cleanedUp = true;
-
-        // ensure state exits even if destroyed
-        currentState?.OnExit(this);
-
-    }*/
-    
-
-
-
     public void MoveTo(Vector3 targetPosition)
     {
         agent.SetDestination(targetPosition);
     }
-
-    /*public bool HasReachedDestination()
-    {
-        if (!agent.pathPending)
-        {
-            if (agent.remainingDistance <= agent.stoppingDistance)
-            {
-                if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }*/
-
-
-    
 
     public UnitController FindNearestEnemy()
     {
