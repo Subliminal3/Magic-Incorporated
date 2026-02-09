@@ -20,4 +20,4 @@ MonoBehaviour:
     count: 3
   enemyUnits:
   - unitPrefab: {fileID: 4819935240474214334, guid: 060a1b86456de474b8a97d517a5ddc41, type: 3}
-    count: 3
+    count: 20
