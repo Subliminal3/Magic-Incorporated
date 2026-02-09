@@ -7,13 +7,12 @@ public class UnitSpawner : MonoBehaviour
     [Header("Data")]
     [SerializeField] private TileDataSO tileData;
 
-    [Header("Spawn areas (must have a BoxCollider)")]
-    public GameObject allySpawn;
-    public GameObject enemySpawn;
+    [Header("Spawn groups (parent objects that contain BoxColliders on children)")]
+    public GameObject allySpawnGroup;
+    public GameObject enemySpawnGroup;
 
-    [Header("Spacing")]
-    [SerializeField] private float minDistance = 1.5f;
-    [SerializeField] private int maxTriesPerUnit = 40;
+    [Header("Row spacing")]
+    [SerializeField] private float spacing = 2f;
 
     [Header("Optional NavMesh snap")]
     [SerializeField] private bool snapToNavMesh = true;
@@ -23,10 +22,7 @@ public class UnitSpawner : MonoBehaviour
     [Header("Rotation")]
     [SerializeField] private bool faceOpposingSpawn = true;
 
-    // caches of used points so spacing stays even
-    private readonly List<Vector3> allyPlaced = new();
-    private readonly List<Vector3> enemyPlaced = new();
-
+    [ContextMenu("Spawn All Now")]
 
     private void Start()
     {
@@ -34,27 +30,62 @@ public class UnitSpawner : MonoBehaviour
     }
     public void SpawnAll()
     {
-        if (tileData == null) return;
+        if (tileData == null) { Debug.LogError("tileData is NULL"); return; }
+        if (allySpawnGroup == null) { Debug.LogError("allySpawnGroup is NULL"); return; }
+        if (enemySpawnGroup == null) { Debug.LogError("enemySpawnGroup is NULL"); return; }
 
-        allyPlaced.Clear();
-        enemyPlaced.Clear();
-
-        SpawnTeam(tileData.allyUnits, allySpawn, enemySpawn, allyPlaced);
-        SpawnTeam(tileData.enemyUnits, enemySpawn, allySpawn, enemyPlaced);
+        SpawnTeamAcrossGroups(tileData.allyUnits, allySpawnGroup, enemySpawnGroup);
+        SpawnTeamAcrossGroups(tileData.enemyUnits, enemySpawnGroup, allySpawnGroup);
     }
 
-    private void SpawnTeam(List<UnitSpawnEntry> entries, GameObject spawnObj, GameObject opposingObj, List<Vector3> placedCache)
+    private void SpawnTeamAcrossGroups(List<UnitSpawnEntry> entries, GameObject groupObj, GameObject opposingGroupObj)
     {
-        if (entries == null || spawnObj == null) return;
+        if (entries == null) return;
 
-        BoxCollider box = spawnObj.GetComponent<BoxCollider>();
-        if (box == null)
+        BoxCollider[] boxes = groupObj.GetComponentsInChildren<BoxCollider>(includeInactive: false);
+        if (boxes.Length == 0)
         {
-            Debug.LogError($"{spawnObj.name} needs a BoxCollider to define spawn bounds.");
+            Debug.LogError($"{groupObj.name} has no BoxColliders in children.");
             return;
         }
 
-        Bounds bounds = box.bounds;
+        int totalCount = SumCounts(entries);
+        if (totalCount <= 0) return;
+
+        // 1) build spots for each rectangle, then combine
+        // We split the total across rectangles evenly: base + remainder
+        int basePerBox = totalCount / boxes.Length;
+        int remainder = totalCount % boxes.Length;
+
+        var allSpots = new List<Vector3>(totalCount);
+
+        Vector3 facingPoint = opposingGroupObj != null ? opposingGroupObj.transform.position : Vector3.zero;
+
+        for (int i = 0; i < boxes.Length; i++)
+        {
+            int need = basePerBox + (i < remainder ? 1 : 0);
+            if (need <= 0) continue;
+
+            // Use the collider's parent forward as row stacking direction (or the collider's transform forward)
+            Vector3 forward = boxes[i].transform.forward;
+
+            var spots = BuildRowPositions(boxes[i], need, spacing, forward);
+
+            // optional navmesh snap
+            if (snapToNavMesh)
+            {
+                for (int s = 0; s < spots.Count; s++)
+                {
+                    if (NavMesh.SamplePosition(spots[s], out var hit, navMeshSampleRadius, navMeshAreaMask))
+                        spots[s] = hit.position;
+                }
+            }
+
+            allSpots.AddRange(spots);
+        }
+
+        // 2) spawn prefabs into the combined spot list
+        int spotIndex = 0;
 
         foreach (var entry in entries)
         {
@@ -62,16 +93,18 @@ public class UnitSpawner : MonoBehaviour
 
             for (int i = 0; i < entry.count; i++)
             {
-                if (!TryGetSpawnPoint(bounds, placedCache, out var pos))
+                if (spotIndex >= allSpots.Count)
                 {
-                    Debug.LogWarning($"Not enough space in '{spawnObj.name}' to spawn more of {entry.unitPrefab.name}. Increase box size or lower minDistance.");
-                    break;
+                    Debug.LogWarning($"Not enough room in '{groupObj.name}' colliders for all units.");
+                    return;
                 }
 
+                Vector3 pos = allSpots[spotIndex++];
+
                 Quaternion rot = Quaternion.identity;
-                if (faceOpposingSpawn && opposingObj != null)
+                if (faceOpposingSpawn && opposingGroupObj != null)
                 {
-                    Vector3 toOther = opposingObj.transform.position - pos;
+                    Vector3 toOther = facingPoint - pos;
                     toOther.y = 0f;
                     if (toOther.sqrMagnitude > 0.001f)
                         rot = Quaternion.LookRotation(toOther.normalized);
@@ -82,57 +115,74 @@ public class UnitSpawner : MonoBehaviour
         }
     }
 
-    private bool TryGetSpawnPoint(Bounds bounds, List<Vector3> placedCache, out Vector3 point)
+    private int SumCounts(List<UnitSpawnEntry> entries)
     {
-        for (int attempt = 0; attempt < maxTriesPerUnit; attempt++)
+        int total = 0;
+        foreach (var e in entries)
+            if (e != null) total += Mathf.Max(0, e.count);
+        return total;
+    }
+
+    // Row/column layout inside ONE BoxCollider
+    // Note: uses box.bounds (axis-aligned). Keep spawn rectangles unrotated for best results.
+    private List<Vector3> BuildRowPositions(BoxCollider box, int count, float spacing, Vector3 forward)
+    {
+        var positions = new List<Vector3>(count);
+
+        Bounds b = box.bounds;
+
+        Vector3 f = forward; f.y = 0f;
+        if (f.sqrMagnitude < 0.0001f) f = Vector3.forward;
+        f.Normalize();
+
+        Vector3 r = Vector3.Cross(Vector3.up, f).normalized;
+
+        float width = b.size.x;
+        float depth = b.size.z;
+
+        int cols = Mathf.Max(1, Mathf.FloorToInt(width / spacing));
+        cols = Mathf.Min(cols, count);
+
+        int rows = Mathf.CeilToInt((float)count / cols);
+
+        int maxRows = Mathf.Max(1, Mathf.FloorToInt(depth / spacing));
+        if (rows > maxRows)
         {
-            Vector3 candidate = RandomPointInBounds(bounds);
+            rows = maxRows;
+            cols = Mathf.CeilToInt((float)count / rows);
+        }
 
-            // If your box collider has height, this will pick random Y too.
-            // Usually you want ground level, so we snap to NavMesh or raycast.
-            if (snapToNavMesh)
-            {
-                if (!NavMesh.SamplePosition(candidate, out var hit, navMeshSampleRadius, navMeshAreaMask))
-                    continue;
+        Vector3 center = b.center;
+        float startZ = -((rows - 1) * spacing) * 0.5f;
 
-                candidate = hit.position;
-            }
-            else
-            {
-                // If not snapping to NavMesh, keep candidate at the top of the box
-                // or just use bounds.center.y. Adjust if needed.
-                candidate.y = bounds.center.y;
-            }
+        int basePerRow = count / rows;
+        int remainder = count % rows;
 
-            if (IsFarEnough(candidate, placedCache))
+        int placed = 0;
+
+        for (int row = 0; row < rows; row++)
+        {
+            int unitsThisRow = basePerRow + (row < remainder ? 1 : 0);
+
+            float rowStartX = -((unitsThisRow - 1) * spacing) * 0.5f;
+            float z = startZ + row * spacing;
+
+            for (int col = 0; col < unitsThisRow; col++)
             {
-                placedCache.Add(candidate);
-                point = candidate;
-                return true;
+                if (placed >= count) break;
+
+                float x = rowStartX + col * spacing;
+
+                Vector3 p = center + r * x + f * z;
+
+                p.x = Mathf.Clamp(p.x, b.min.x + 0.05f, b.max.x - 0.05f);
+                p.z = Mathf.Clamp(p.z, b.min.z + 0.05f, b.max.z - 0.05f);
+
+                positions.Add(p);
+                placed++;
             }
         }
 
-        point = default;
-        return false;
-    }
-
-    private Vector3 RandomPointInBounds(Bounds b)
-    {
-        return new Vector3(
-            Random.Range(b.min.x, b.max.x),
-            Random.Range(b.min.y, b.max.y),
-            Random.Range(b.min.z, b.max.z)
-        );
-    }
-
-    private bool IsFarEnough(Vector3 candidate, List<Vector3> placedCache)
-    {
-        float minSqr = minDistance * minDistance;
-        for (int i = 0; i < placedCache.Count; i++)
-        {
-            if ((placedCache[i] - candidate).sqrMagnitude < minSqr)
-                return false;
-        }
-        return true;
+        return positions;
     }
 }
