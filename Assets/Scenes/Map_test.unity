@@ -8748,7 +8748,7 @@ MonoBehaviour:
   zoomInDistance: 1
   moveSmoothness: 3
   zoomCanvas: {fileID: 399373520}
-  zoomCompleteThreshold: 0.05
+  zoomCompleteThreshold: 0.4
 --- !u!4 &2096159450
 Transform:
   m_ObjectHideFlags: 0
