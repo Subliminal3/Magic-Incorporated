@@ -2,51 +2,108 @@ using UnityEngine;
 
 public class InputManager : MonoBehaviour
 {
-    [SerializeField]
-    private LayerMask tileLayer; // Set this in the Inspector to your "Tiles" layer
-    private GameObject lastHighlightedTile;
+    [SerializeField] private LayerMask tileLayer;
+    [SerializeField] private string highlightChildName = "Highlight";
+
+    private Transform hoveredTileRoot;
+    private GameObject hoveredHighlight;
+
+    private Transform selectedTileRoot;
+    private GameObject selectedHighlight;
 
     void Update()
     {
-        DetectTile();
+        // Tab clears the locked selection
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            ClearSelection();
+            // After clearing, hover will work again this frame
+        }
+
+        DetectTileHover();
+
+        // Click locks selection (keeps highlight until Tab)
+        if (Input.GetMouseButtonDown(0) && selectedTileRoot == null && hoveredTileRoot != null)
+        {
+            SelectHovered();
+        }
     }
 
-    void DetectTile()
+    void DetectTileHover()
     {
-        // Create a ray from the camera through the mouse position
+        // If a tile is selected, we don't change hover highlight
+        if (selectedTileRoot != null)
+            return;
+
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, 100f, tileLayer))
+        if (Physics.Raycast(ray, out RaycastHit hit, 100f, tileLayer))
         {
-            GameObject currentTile = hit.collider.gameObject;
+            Transform tileRoot = FindTileRootWithHighlight(hit.collider.transform);
 
-            // Only act if we've moved to a NEW tile
-            if (currentTile != lastHighlightedTile)
+            if (tileRoot != hoveredTileRoot)
             {
-                ClearHighlight();
-                HighlightTile(currentTile);
+                ClearHover();
+                SetHover(tileRoot);
             }
         }
         else
         {
-            ClearHighlight();
+            ClearHover();
         }
     }
 
-    void HighlightTile(GameObject tile)
+    Transform FindTileRootWithHighlight(Transform start)
     {
-        lastHighlightedTile = tile;
-        // Example: Change color or enable a highlight child object
-        tile.GetComponent<Renderer>().material.color = Color.yellow;
-    }
-
-    void ClearHighlight()
-    {
-        if (lastHighlightedTile != null)
+        Transform t = start;
+        while (t != null)
         {
-            lastHighlightedTile.GetComponent<Renderer>().material.color = Color.white;
-            lastHighlightedTile = null;
+            if (t.Find(highlightChildName) != null)
+                return t;
+            t = t.parent;
         }
+        return start;
+    }
+
+    void SetHover(Transform tileRoot)
+    {
+        if (tileRoot == null) return;
+
+        Transform h = tileRoot.Find(highlightChildName);
+        if (h == null) return;
+
+        h.gameObject.SetActive(true);
+        hoveredTileRoot = tileRoot;
+        hoveredHighlight = h.gameObject;
+    }
+
+    void ClearHover()
+    {
+        if (hoveredHighlight != null)
+            hoveredHighlight.SetActive(false);
+
+        hoveredHighlight = null;
+        hoveredTileRoot = null;
+    }
+
+    void SelectHovered()
+    {
+        // Lock the currently hovered tile
+        selectedTileRoot = hoveredTileRoot;
+        selectedHighlight = hoveredHighlight;
+
+        // Prevent hover system from turning it off later
+        
+    }
+
+    void ClearSelection()
+    {
+        if (selectedHighlight != null)
+            selectedHighlight.SetActive(false);
+
+        selectedHighlight = null;
+        selectedTileRoot = null;
+        hoveredTileRoot = null;
+        hoveredHighlight = null;
     }
 }
