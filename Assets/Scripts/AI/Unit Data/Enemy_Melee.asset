@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cb2304e01b45144b91e70667bbc838a, type: 3}
   m_Name: Enemy_Melee
   m_EditorClassIdentifier: 
-  unitName: 
+  unitName: Enemy Melee
   unitPrefab: {fileID: 4819935240474214334, guid: 060a1b86456de474b8a97d517a5ddc41, type: 3}
   maxHealth: 2
   attackDamage: 1
@@ -24,3 +24,6 @@ MonoBehaviour:
   stoppingDistance: 4.8
   detectionRange: 10
   defaultTargetType: 1
+  thumbnail: {fileID: 10911, guid: 0000000000000000f000000000000000, type: 0}
+  quanitity: 10
+  description: A dangerous enemy melee unit.

@@ -1,5 +1,6 @@
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 [CreateAssetMenu(fileName = "NewUnitData", menuName = "Units/Unit Data")]
 public class UnitData : ScriptableObject
@@ -23,5 +24,11 @@ public class UnitData : ScriptableObject
     public float detectionRange = 10f;
     public TargetType defaultTargetType;
 
-    
+    [Header("Battle Data")]
+    public Sprite thumbnail;
+    public int quanitity;
+    public string description;
+
+
+
 }
