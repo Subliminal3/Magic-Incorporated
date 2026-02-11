@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
 
 public class UI : MonoBehaviour
 {
@@ -39,4 +41,5 @@ public class UI : MonoBehaviour
         //update slider to player hp
         playerHpSlider.value = playerStats.currentHP/100;
     }
+
 }

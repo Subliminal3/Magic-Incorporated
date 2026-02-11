@@ -31,6 +31,7 @@ public class MapCam : MonoBehaviour
     private bool _zoomingToTarget;
     private bool tileSelected = false;
     private bool _canvasShown;
+    private RunData runData;
 
     void Start()
     {
@@ -46,6 +47,8 @@ public class MapCam : MonoBehaviour
         _targetPivotRot = _homePivotRot;
         _targetCamLocalPos = _homeCamLocalPos;
         _targetCamLocalRot = _homeCamLocalRot;
+
+        runData = FindFirstObjectByType<RunData>();
 
         if (zoomCanvas != null)
             zoomCanvas.SetActive(false);
@@ -71,7 +74,11 @@ public class MapCam : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit, 10000f, clickableMask, QueryTriggerInteraction.Ignore))
         {
+            //clicked hex
             Transform clicked = hit.collider.transform;
+
+            //Set hexdata to clicked hex data
+            runData.hexData = clicked.GetComponentInChildren<HexCell>();
 
             Vector3 focusPoint = clicked.position + focusOffset;
 
@@ -100,6 +107,9 @@ public class MapCam : MonoBehaviour
         _zoomingToTarget = false;
         tileSelected = false;
         _canvasShown = false;
+
+        //reset hexData
+        runData.hexData = null;
 
         if (zoomCanvas != null)
             zoomCanvas.SetActive(false);

@@ -5,7 +5,7 @@ using UnityEngine.AI;
 public class UnitSpawner : MonoBehaviour
 {
     [Header("Data")]
-    [SerializeField] private TileDataSO tileData;
+    private HexCell hexData;
 
     [Header("Spawn groups (parent objects that contain BoxColliders on children)")]
     public GameObject allySpawnGroup;
@@ -26,19 +26,20 @@ public class UnitSpawner : MonoBehaviour
 
     private void Start()
     {
+        hexData = FindFirstObjectByType<RunData>().hexData;
         SpawnAll();
     }
     public void SpawnAll()
     {
-        if (tileData == null) { Debug.LogError("tileData is NULL"); return; }
+        if (hexData == null) { Debug.LogError("hexData is NULL"); return; }
         if (allySpawnGroup == null) { Debug.LogError("allySpawnGroup is NULL"); return; }
         if (enemySpawnGroup == null) { Debug.LogError("enemySpawnGroup is NULL"); return; }
 
-        SpawnTeamAcrossGroups(tileData.allyUnits, allySpawnGroup, enemySpawnGroup);
-        SpawnTeamAcrossGroups(tileData.enemyUnits, enemySpawnGroup, allySpawnGroup);
+        SpawnTeamAcrossGroups(hexData.allyUnits, allySpawnGroup, enemySpawnGroup);
+        SpawnTeamAcrossGroups(hexData.enemyUnits, enemySpawnGroup, allySpawnGroup);
     }
 
-    private void SpawnTeamAcrossGroups(List<UnitSpawnEntry> entries, GameObject groupObj, GameObject opposingGroupObj)
+    private void SpawnTeamAcrossGroups(List<HexCell.UnitSpawnEntry> entries, GameObject groupObj, GameObject opposingGroupObj)
     {
         if (entries == null) return;
 
@@ -115,7 +116,7 @@ public class UnitSpawner : MonoBehaviour
         }
     }
 
-    private int SumCounts(List<UnitSpawnEntry> entries)
+    private int SumCounts(List<HexCell.UnitSpawnEntry> entries)
     {
         int total = 0;
         foreach (var e in entries)
